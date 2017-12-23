@@ -9,17 +9,17 @@ __Todo:__ UFC.com results data, Sherdog.com data, confirm accuracy of weight-cut
 
 
 __Scripts:__
-*_mma_data_fightmetric.py_ - scrapes FightMetric.com (fight results)
-	*_Input:_ none
-	*_Output:_ mma_data_fightmetric.csv
+* _mma_data_fightmetric.py_ - scrapes FightMetric.com (fight results)
+	* _Input:_ none
+	* _Output:_ mma_data_fightmetric.csv
 
-*_mma_data_ufc.py_ - scrapes UFC.com "printFightCard" for matchup data
-	*_Input:_ mma_data_ufc_missing.csv - missing data from UFC120
-	*_Output:_ mma_data_ufc.csv
+* _mma_data_ufc.py_ - scrapes UFC.com "printFightCard" for matchup data
+	* _Input:_ mma_data_ufc_missing.csv - missing data from UFC120
+	* _Output:_ mma_data_ufc.csv
 
-*_mma_data_weight_cutting_join.py_ - joins FightMetric with weight-cutting data
-	*_Input:_ mma_data_weight_cutting.csv (from @dimspace), mma_data_fightmetric.csv
-	*_Output:_ mma_data_weight_cutting_joined.csv
+* _mma_data_weight_cutting_join.py_ - joins FightMetric with weight-cutting data
+	* _Input:_ mma_data_weight_cutting.csv (from @dimspace), mma_data_fightmetric.csv
+	* _Output:_ mma_data_weight_cutting_joined.csv
 
 
 
