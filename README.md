@@ -2,7 +2,7 @@
 
 __Goal:__ Gather MMA data from as many sources as possible.
 
-__Status:__ FightMetric.com and UFC.com data scraped. (Only matchup data from UFC.com currently, need to add results.) Weight-cutting data from twitter user @dimspace.
+__Status:__ FightMetric.com, UFC.com, Sherdog.com (UFC, Pride, WEC, Strikeforce) data scraped. (Only matchup data from UFC.com currently, need to add results.) Weight-cutting data from twitter user @dimspace.
 
 __Todo:__ UFC.com results data, Sherdog.com data, confirm accuracy of weight-cutting data, join all data and cross check.
 
@@ -16,6 +16,10 @@ __Scripts:__
 * __mma_data_ufc.py__ - scrapes UFC.com "printFightCard" for matchup data
 	* _Input:_ mma_data_ufc_missing.csv - missing data from UFC120
 	* _Output:_ mma_data_ufc.csv
+
+* __mma_data_sherdog.py__ - scrapes Sherdog.com (fight results for UFC, Pride, WEC, Strikeforce)
+	* _Input:_ none
+	* _Output:_ mma_data_sherdog.csv
 
 * __mma_data_weight_cutting_join.py__ - joins FightMetric with weight-cutting data
 	* _Input:_ mma_data_weight_cutting.csv (from @dimspace), mma_data_fightmetric.csv
