@@ -57,8 +57,7 @@ print urls_list
 
 
 
-###debug
-##urls_list = urls_list[:2]
+
 
 
 event_dfs_list = []
@@ -188,9 +187,6 @@ for myurl in urls_list:
 
 
 
-#todo:
-    #clean up refaree name in fight end method
-    #get rid of fighter nickname
 
 
 
@@ -226,25 +222,18 @@ sherdog_df['Method'] = sherdog_df['Method'].map(strip_ref_name)
 
 
 
-### MISSING DATA for two fight cards
-### http://www.ufc.com/event/UFC120-london-event/printFightCard  -- manually filled in
-### http://www.ufc.com/event/Ultimate-Japan/printFightCard -- still missing
-##
-##ufc_missing_data = pd.read_csv(r'mma_data_ufc_missing.csv',low_memory=False)
-##
-##ufc_df = pd.concat([ufc_df,ufc_missing_data],ignore_index=True)
 
 
 #change column order
-##sherdog_df = sherdog_df[['Event','Date','Location','Fight Number','Fighter','Record','Height','Weight','Reach','Leg Reach','Url']]
+sherdog_df = sherdog_df[['Organization','Event','Date','Fight Number','Result','Fighter','Opponent','Method','Round','Time','Url']]
 
 sherdog_df = sherdog_df.sort_values(['Date','Fight Number'], ascending=[False,True])
 
-sherdog_df = sherdog_df[['Organization','Event','Date','Fight Number','Result','Fighter','Opponent','Method','Round','Time','Url']]
 
 
 
-sherdog_df.to_csv(r'mma_data_sherdog.csv',index=False)
+
+sherdog_df.to_csv(r'../output data/mma_data_sherdog.csv',index=False)
 
 
 

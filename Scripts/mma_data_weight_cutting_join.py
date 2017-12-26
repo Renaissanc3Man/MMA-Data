@@ -13,6 +13,14 @@ def replace_if_in_dict(parm,mydict):
         parm = mydict[parm]
     return parm
 
+def fillna_from_other_col(df,from_col,to_col):
+    original_df_cols = list(df.columns)
+    cols_minus_to_col = list(df.columns)
+    cols_minus_to_col.remove(to_col)
+    df = pd.concat([df[cols_minus_to_col],df[[to_col]].apply(lambda x: x.fillna(value=df[from_col]))],axis=1)
+    df = df[original_df_cols] #preserve column order
+    return df
+
 
 
 
@@ -32,27 +40,11 @@ def replace_if_in_dict(parm,mydict):
 
 
 #import mma wins/losses data (scraped from fightmetric)
-mma = pd.read_csv(r'mma_data_fightmetric.csv',low_memory=False)
-#fix typographic error from fightmetric for Jessica Rose-Clark
-namefix_dict = {'Jessica-Rose Clark':'Jessica Rose-Clark'}
-mma['Fighter'] = mma['Fighter'].map(lambda x: replace_if_in_dict(str(x),namefix_dict))
-
-
-#mma = mma[['WL','Fighter','Weightclass','Method','Opponent','Date']]
-
+mma = pd.read_csv(r'../output data/mma_data_fightmetric.csv',low_memory=False)
 mma['Date'] = pd.to_datetime(mma['Date'])
 
 
 
-
-#create a month column because the weight cutting data is only given at that level
-#we need this to join to the wins/losses dataset
-#note: this will cause an error on the ultra rare occasion a fighter fights twice in a month
-def get_month(mydate):
-    if mydate.day != 1:
-        mydate = mydate - np.timedelta64(mydate.day - 1,'D')
-    return mydate
-mma['Month'] = mma['Date'].map(get_month)
 
 
 
@@ -60,23 +52,20 @@ mma['Month'] = mma['Date'].map(get_month)
 
 
 #import weight cutting data, source (manually modified, removed name formatting issues, etc) = https://twitter.com/dimspace/status/943181086330425346 @dimspace https://t.co/2ulRCwzxkx
-wcut = pd.read_csv(r"mma_data_weight_cutting.csv",low_memory=False)
-wcut['Month'] = pd.to_datetime(wcut['Month'])
-wcut = wcut.rename(columns={'Event':'Event (Weight-Cut)'})
+wcut = pd.read_csv(r"../input data/mma_data_weight_cutting.csv",low_memory=False)
+wcut['Date'] = pd.to_datetime(wcut['Date'])
+del wcut['Event'] #fill in with more accurate fightmetric data
 
 
 
 
 
-
-
-wcut = mma.merge(wcut,on=['Fighter','Month'],how='inner')
-
+wcut = mma[['Date','Fight Number','Result','Fighter','Opponent','Method']].merge(wcut,on=['Fighter','Date'],how='right')
 
 
 
-
-
+#for fights that never happened, fill details from
+wcut = mma[['Event','Date']].drop_duplicates().merge(wcut,on='Date',how='right')
 
 
 
@@ -90,7 +79,7 @@ def main_co_main_ucard(fight_number):
     else:
         result = 'Undercard'
     return result
-wcut['Main Co-Main vs Undercard'] = wcut['Fight_Number'].map(main_co_main_ucard)
+wcut['Main Co-Main vs Undercard'] = wcut['Fight Number'].map(main_co_main_ucard)
 
 
 
@@ -98,7 +87,7 @@ wcut['Main Co-Main vs Undercard'] = wcut['Fight_Number'].map(main_co_main_ucard)
 
 
 
-wcut.to_csv(r"mma_data_weight_cutting_joined.csv",index=False)
+wcut.to_csv(r"../output data/mma_data_weight_cutting_joined.csv",index=False)
 
 
 

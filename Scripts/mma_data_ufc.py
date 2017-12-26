@@ -16,7 +16,7 @@ def replace_if_in_dict(parm,mydict):
 
 
 
-
+#todo: fix location (many of them are showing up as "tickets")
 
 
 
@@ -103,8 +103,9 @@ for myurl in urls_list:
         event_date = pd.to_datetime(event_header[rownums[2]].strip())
         event_location = event_header[rownums[3]].strip()
 
-
-
+        #workaround for a few early ufc events where data is out of order
+        if event_location in ['Tickets','Fantasy']:
+            event_location = event_header[26].strip()
 
 
 
@@ -142,15 +143,17 @@ for myurl in urls_list:
 
         #transpose and join info in tabular form
         fighter_dfs_list = []
-        for i,myfighter in enumerate(fighter1):
+        for i in range(0,len(fighter1)):
             fighter_df = stat_dfs_list[i][[0,1]].set_index(1).T  #fighter1 stats in col1
-            fighter_df['Fighter'] = myfighter.get_text().encode('ascii','ignore')
+            fighter_df['Fighter'] = fighter1[i].get_text().encode('ascii','ignore')
+            fighter_df['Opponent'] = fighter2[i].get_text().encode('ascii','ignore')
             fighter_df['Fight Number'] = i
             fighter_dfs_list.append(fighter_df)
 
-        for i,myfighter in enumerate(fighter2):
+        for i in range(0,len(fighter2)):
             fighter_df = stat_dfs_list[i][[1,2]].set_index(1).T #fighter2 stats in col3
-            fighter_df['Fighter'] = myfighter.get_text().encode('ascii','ignore')
+            fighter_df['Fighter'] = fighter2[i].get_text().encode('ascii','ignore')
+            fighter_df['Opponent'] = fighter1[i].get_text().encode('ascii','ignore')
             fighter_df['Fight Number'] = i
             fighter_dfs_list.append(fighter_df)
 
@@ -188,19 +191,73 @@ ufc_df = pd.concat(dfs_list,ignore_index=True)
 # http://www.ufc.com/event/UFC120-london-event/printFightCard  -- manually filled in
 # http://www.ufc.com/event/Ultimate-Japan/printFightCard -- still missing
 
-ufc_missing_data = pd.read_csv(r'mma_data_ufc_missing.csv',low_memory=False)
+ufc_missing_data = pd.read_csv(r'../input data/mma_data_ufc_missing.csv',low_memory=False)
 
 ufc_df = pd.concat([ufc_df,ufc_missing_data],ignore_index=True)
 
 
+
+
+
+
+
+
+
+
+
+#some of the weights inexplicably are reported as 1 or 2 lbs off
+#and heavyweight is reported as their actual weight
+#however, the weight attribute is not the actual measured weight for the fight
+weight_fix_dict = {154:155,
+                   168:170,
+                   169:170,
+                   184:185,
+                   204:205,
+                   206:205}
+def fix_weightclass(x):
+    try:
+        myweight = int(re.match(r'(?i)(^\d+)(.*|$)',str(x)).group(1))
+
+        #fix erroneous weights
+        if myweight not in [105,115,125,135,145,155,170,185,205,265]:
+            if myweight in weight_fix_dict.keys():
+                myweight = weight_fix_dict[myweight]
+            elif myweight > 205 and myweight <= 265: #fix heavyweight, but keep the few 300 lb'ers
+                myweight = 265
+        return myweight
+    except:
+        print x
+        print str(traceback.format_exc())
+        return x
+ufc_df['Weightclass'] = ufc_df['Weight'].map(fix_weightclass)
+
+del ufc_df['Weight']
+
+
+
+
+
+#fix issue with location = ", Singapore"
+#also fix "LAS VEGAS"
+ufc_df['Location'] = ufc_df['Location'].map(lambda x: replace_if_in_dict(x,{', Singapore':'Singapore, Republic of Singapore',
+                                                                            'LAS VEGAS':'Las Vegas, NV',
+                                                                            'How to Watch':'Fort Hood, TX'}))
+
+
+
+
+
 #change column order
-ufc_df = ufc_df[['Event','Date','Location','Fight Number','Fighter','Record','Height','Weight','Reach','Leg Reach','Url']]
+ufc_df = ufc_df[['Event','Date','Location','Fight Number','Fighter','Record','Height','Weightclass','Reach','Leg Reach','Url']]
 
 ufc_df = ufc_df.sort_values(['Date','Fight Number'], ascending=[False,True])
 
 
 
-ufc_df.to_csv(r'mma_data_ufc.csv',index=False)
+
+
+
+ufc_df.to_csv(r'../output data/mma_data_ufc.csv',index=False)
 
 
 

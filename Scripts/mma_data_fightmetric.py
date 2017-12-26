@@ -81,8 +81,8 @@ for myurl in urls_list:
         #strip whitespace from column headers
         fightmetric_df.columns = [re.sub(r"\W", "",i) for i in fightmetric_df.columns]
 
-        fightmetric_df['Fight'] = fightmetric_df['Fighter'].map(lambda x: re.sub('  ',' vs. ',x))
-        fightmetric_df['Fight_Number'] = fightmetric_df.index
+##        fightmetric_df['Fight'] = fightmetric_df['Fighter'].map(lambda x: re.sub('  ',' vs. ',x))
+        fightmetric_df['Fight Number'] = fightmetric_df.index
 
         #table is concatenated by '  ' with first element being winner's stats
         fightmetric_df_winner = fightmetric_df.copy()
@@ -108,9 +108,10 @@ for myurl in urls_list:
         #append date to df
         fightmetric_df['Date'] = event_date
         fightmetric_df['Event'] = event_title
+        fightmetric_df['Url'] = myurl
 
 
-        fightmetric_df = fightmetric_df.sort_values('Fight_Number')
+        fightmetric_df = fightmetric_df.sort_values('Fight Number')
 
         fightmetric_dfs_list.append(fightmetric_df)
 
@@ -123,12 +124,40 @@ fightmetric_df = pd.concat(fightmetric_dfs_list,ignore_index=True)
 
 
 
-#fix typographic error from fightmetric for Jessica Rose-Clark
-namefix_dict = {'Jessica-Rose Clark':'Jessica Rose-Clark'}
-fightmetric_df['Fighter'] = fightmetric_df['Fighter'].map(lambda x: replace_if_in_dict(str(x),namefix_dict))
 
 
-fightmetric_df.to_csv(r'mma_data_fightmetric.csv',index=False)
+#change column names to be consistent across datasets
+fightmetric_df = fightmetric_df.rename(columns={'WL':'Result',
+                                                'Str':'Sig Strikes',
+                                                'Td':'Takedowns',
+                                                'Sub':'Sub Attempts',
+                                                'Pass':'Guard Passes',
+                                                'Weightclass':'Division'})
+
+#convert Weightclass to numeric value
+#todo: fix each of the catchweights
+weightclass_dict = {'Catch Weight':0,
+                    'Super Heavyweight':0,
+                    'Open Weight':0,
+                    'Women\'s Strawweight':115,
+                    'Women\'s Flyweight':125,
+                    'Flyweight':125,
+                    'Bantamweight':135,
+                    'Women\'s Bantamweight':135,
+                    'Featherweight':145,
+                    'Women\'s Featherweight':145,
+                    'Lightweight':155,
+                    'Welterweight':170,
+                    'Middleweight':185,
+                    'Light Heavyweight':205,
+                    'Heavyweight':265}
+fightmetric_df['Weightclass'] = fightmetric_df['Division'].map(weightclass_dict)
+
+
+fightmetric_df = fightmetric_df[['Event','Date','Fight Number','Division','Weightclass','Fighter','Opponent','Result','Method','Round','Time','Sig Strikes','Takedowns','Sub Attempts','Guard Passes','Url']]
+
+
+fightmetric_df.to_csv(r'../output data/mma_data_fightmetric.csv',index=False)
 
 
 
