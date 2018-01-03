@@ -1,17 +1,22 @@
-import numpy as np
-import pandas as pd
-import re
-import datetime
-import traceback
+import os, sys
+sys.path.append(os.path.dirname(__file__))
+from mma_data_library import *
 
-import urllib2
-from bs4 import BeautifulSoup
 
-#for later use in replacing misspelled names
-def replace_if_in_dict(parm,mydict):
-    if not pd.isnull(parm) and parm in list(mydict.keys()):
-        parm = mydict[parm]
-    return parm
+##import numpy as np
+##import pandas as pd
+##import re
+##import datetime
+##import traceback
+##
+##import urllib2
+##from bs4 import BeautifulSoup
+##
+###for later use in replacing misspelled names
+##def replace_if_in_dict(parm,mydict):
+##    if not pd.isnull(parm) and parm in list(mydict.keys()):
+##        parm = mydict[parm]
+##    return parm
 
 
 
@@ -126,6 +131,14 @@ fightmetric_df = pd.concat(fightmetric_dfs_list,ignore_index=True)
 
 
 
+#clean double spaces, trip whitespace, etc
+fightmetric_df['Fighter'] = fightmetric_df['Fighter'].map(clean_fighter_name)
+
+fighter_name_standardization_dict = create_fighter_name_standardization_dict()
+fightmetric_df['Fighter'] = fightmetric_df['Fighter'].map(lambda x: replace_if_in_dict(x,fighter_name_standardization_dict))
+
+
+
 #change column names to be consistent across datasets
 fightmetric_df = fightmetric_df.rename(columns={'WL':'Result',
                                                 'Str':'Sig Strikes',
@@ -136,26 +149,14 @@ fightmetric_df = fightmetric_df.rename(columns={'WL':'Result',
 
 #convert Weightclass to numeric value
 #todo: fix each of the catchweights
-weightclass_dict = {'Catch Weight':0,
-                    'Super Heavyweight':0,
-                    'Open Weight':0,
-                    'Women\'s Strawweight':115,
-                    'Women\'s Flyweight':125,
-                    'Flyweight':125,
-                    'Bantamweight':135,
-                    'Women\'s Bantamweight':135,
-                    'Featherweight':145,
-                    'Women\'s Featherweight':145,
-                    'Lightweight':155,
-                    'Welterweight':170,
-                    'Middleweight':185,
-                    'Light Heavyweight':205,
-                    'Heavyweight':265}
 fightmetric_df['Weightclass'] = fightmetric_df['Division'].map(weightclass_dict)
 
 
 fightmetric_df = fightmetric_df[['Event','Date','Fight Number','Division','Weightclass','Fighter','Opponent','Result','Method','Round','Time','Sig Strikes','Takedowns','Sub Attempts','Guard Passes','Url']]
 
+
+
+#todo: add code to fix double spaces and trim in fighter name
 
 fightmetric_df.to_csv(r'../output data/mma_data_fightmetric.csv',index=False)
 

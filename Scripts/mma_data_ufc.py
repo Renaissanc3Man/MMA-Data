@@ -1,17 +1,21 @@
-import numpy as np
-import pandas as pd
-import re
-import datetime
-import traceback
+import os, sys
+sys.path.append(os.path.dirname(__file__))
+from mma_data_library import *
 
-import urllib2
-from bs4 import BeautifulSoup
-
-#for later use in replacing misspelled names
-def replace_if_in_dict(parm,mydict):
-    if not pd.isnull(parm) and parm in list(mydict.keys()):
-        parm = mydict[parm]
-    return parm
+##import numpy as np
+##import pandas as pd
+##import re
+##import datetime
+##import traceback
+##
+##import urllib2
+##from bs4 import BeautifulSoup
+##
+###for later use in replacing misspelled names
+##def replace_if_in_dict(parm,mydict):
+##    if not pd.isnull(parm) and parm in list(mydict.keys()):
+##        parm = mydict[parm]
+##    return parm
 
 
 
@@ -244,7 +248,19 @@ ufc_df['Location'] = ufc_df['Location'].map(lambda x: replace_if_in_dict(x,{', S
                                                                             'How to Watch':'Fort Hood, TX'}))
 
 
+#clean double spaces, trip whitespace, etc
+ufc_df['Fighter'] = ufc_df['Fighter'].map(clean_fighter_name)
 
+fighter_name_standardization_dict = create_fighter_name_standardization_dict()
+ufc_df['Fighter'] = ufc_df['Fighter'].map(lambda x: replace_if_in_dict(x,fighter_name_standardization_dict))
+
+
+###fix Fighter name typographic errors
+##name_fix_dict = {r'Antonio  Carvalho':r'Antonio Carvalho',
+##                 r'Minotauro Nogueira':r'Antonio Rodrigo Nogueira',
+##                 r'Wang Anying':'Anying Wang'}
+##ufc_df['Fighter'] = ufc_df['Fighter'].map(lambda x: replace_if_in_dict(x,name_fix_dict))
+##ufc_df['Fighter'] = ufc_df['Fighter'].map(lambda x: x.replace('  ',' ')) #fix all issues with double spaces between fighter names
 
 
 #change column order
@@ -254,7 +270,7 @@ ufc_df = ufc_df.sort_values(['Date','Fight Number'], ascending=[False,True])
 
 
 
-
+#todo: add code to fix double spaces and trim in fighter name
 
 
 ufc_df.to_csv(r'../output data/mma_data_ufc.csv',index=False)

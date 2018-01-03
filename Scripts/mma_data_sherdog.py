@@ -1,24 +1,29 @@
-import numpy as np
-import pandas as pd
-import re
-import datetime
-import traceback
-
-import urllib2
-from bs4 import BeautifulSoup
-
-#for later use in replacing misspelled names
-def replace_if_in_dict(parm,mydict):
-    if not pd.isnull(parm) and parm in list(mydict.keys()):
-        parm = mydict[parm]
-    return parm
+import os, sys
+sys.path.append(os.path.dirname(__file__))
+from mma_data_library import *
 
 
+##import numpy as np
+##import pandas as pd
+##import re
+##import datetime
+##import traceback
+##
+##import urllib2
+##from bs4 import BeautifulSoup
+##
+###for later use in replacing misspelled names
+##def replace_if_in_dict(parm,mydict):
+##    if not pd.isnull(parm) and parm in list(mydict.keys()):
+##        parm = mydict[parm]
+##    return parm
 
 
 
 
 
+
+#todo: figure out why http://www.sherdog.com/events/UFC-Fight-Night-121-Werdum-vs-Tybura-61985 data is missing
 
 
 
@@ -221,6 +226,12 @@ sherdog_df['Method'] = sherdog_df['Method'].map(strip_ref_name)
 
 
 
+#clean double spaces, trip whitespace, etc
+sherdog_df['Fighter'] = sherdog_df['Fighter'].map(clean_fighter_name)
+
+fighter_name_standardization_dict = create_fighter_name_standardization_dict()
+sherdog_df['Fighter'] = sherdog_df['Fighter'].map(lambda x: replace_if_in_dict(x,fighter_name_standardization_dict))
+
 
 
 
@@ -228,6 +239,8 @@ sherdog_df['Method'] = sherdog_df['Method'].map(strip_ref_name)
 sherdog_df = sherdog_df[['Organization','Event','Date','Fight Number','Result','Fighter','Opponent','Method','Round','Time','Url']]
 
 sherdog_df = sherdog_df.sort_values(['Date','Fight Number'], ascending=[False,True])
+
+
 
 
 
