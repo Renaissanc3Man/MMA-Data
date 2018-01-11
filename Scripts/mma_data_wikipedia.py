@@ -69,7 +69,7 @@ for myevent in events_list:
         if myurl == r'https://en.wikipedia.org/wiki/UFC_on_Fuel_TV:_Sanchez_vs._Ellenberger':
             d=1
 
-        if myurl == r'https://en.wikipedia.org/wiki/UFC_Fight_Night:_Lamas_vs._Penn':
+        if myurl == r'https://en.wikipedia.org/wiki/UFC_Fight_Night:_Rockhold_vs._Bisping':
             d=1
 
 ##        event_df = pd.read_html(myurl,attrs={'class':'toccolours'})[0]

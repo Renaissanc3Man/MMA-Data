@@ -1,57 +1,7 @@
 import os, sys
 sys.path.append(os.path.dirname(__file__))
 from mma_data_library import *
-
-##import numpy as np
-##import pandas as pd
-##import re
-##import datetime
-##import traceback
-##import time
-##
-##import urllib2
-##from bs4 import BeautifulSoup
-##
-###for later use in replacing misspelled names
-##def replace_if_in_dict(parm,mydict):
-##    if not pd.isnull(parm) and parm in list(mydict.keys()):
-##        parm = mydict[parm]
-##    return parm
-##
-##
-##
-##
-##
-##def safe_reset_index(mydataframe):
-##    try:
-##        mydataframe = mydataframe.reset_index()
-##    except:
-##        pass
-##    for mycol in ['index','level_0','level_1','']:
-##        try:
-##            del mydataframe[mycol]
-##        except:
-##            pass
-##    return mydataframe
-##
-###makes two column dataframe out of dict
-##def pd_dict_to_df(mydict,column_names):
-##    df = pd.DataFrame(pd.Series(mydict))
-##    df.columns = [column_names[1]]
-##    df[column_names[0]] = df.index
-##    df = safe_reset_index(df)
-##    df = df[column_names] #put in order
-##    return df
-##
-##
-##def fillna_from_other_col(df,from_col,to_col):
-##    original_df_cols = list(df.columns)
-##    cols_minus_to_col = list(df.columns)
-##    cols_minus_to_col.remove(to_col)
-##    df = pd.concat([df[cols_minus_to_col],df[[to_col]].apply(lambda x: x.fillna(value=df[from_col]))],axis=1)
-##    df = df[original_df_cols] #preserve column order
-##    return df
-
+import requests
 
 
 
@@ -84,49 +34,60 @@ all_fighter_names_list = all_fighter_names_list + ['Brett Rogers','Alexis Vila',
 
 
 
-#generate list of all mmafighting.com archives by year/month
-link_urls_list = []
-for i in range(2010,datetime.datetime.now().year+1):
-    if i < datetime.datetime.now().year:
-        for j in range(1,13):
-            link_urls_list.append(r'https://www.mmafighting.com/archives/' + str(i) + '/' + str(j))
-    else:
-        for j in range(1,datetime.datetime.now().month+1):
-            link_urls_list.append(r'https://www.mmafighting.com/archives/' + str(i) + '/' + str(j))
-print len(link_urls_list)
+
+
+#generate list of all mmafighting.com archives by year/month/date
+##link_urls_list = []
+##for i in np.arange('2010-01-01',str(datetime.datetime.now().date()),dtype='datetime64[D]'):
+##    link_urls_list.append(r'https://www.mmafighting.com/archives/' + str(i) + '/' + str(j))
+##
+##print len(link_urls_list)
+link_urls_df = pd.DataFrame(pd.Series(np.arange('2010-01-01',str(datetime.datetime.now().date()),dtype='datetime64[D]')),columns=['Date'])
+link_urls_df['Date'] = pd.to_datetime(link_urls_df['Date'])
+link_urls_df['Link Urls'] = link_urls_df['Date'].map(lambda x: r'https://www.mmafighting.com/archives/' + x.strftime(r'%Y') + '/' + str(int(x.strftime(r'%m'))) + '/' + str(int(x.strftime(r'%d'))))
+
+link_urls_list = link_urls_df['Link Urls'].tolist()
 
 
 ###debug
-##link_urls_list = link_urls_list[:5]
+##link_urls_list = [r'https://www.mmafighting.com/archives/2010/4/4']
 
 
 urls_list = []
 for i,mylink_url in enumerate(link_urls_list):
-    print i
+    print i, mylink_url
+    page_found = True
     try:
         page = urllib2.urlopen(mylink_url) #workaround for http error 429: too many requests
-    except:
-        print str(traceback.format_exc())
-        for j in range(0,500):
-            try:
-                print 'sleeping 15 seconds'
-                time.sleep(15)
-                print 'done'
-                page = urllib2.urlopen(mylink_url)
-                break
-            except:
-                print '\n\n\n' + str(j) + '\n\n\n'
-                print str(traceback.format_exc())
+    except urllib2.HTTPError, err:
+        if err.code == 404:
+            page_found = False
+            print 'page not found, skipping', mylink_url
+        else:
+            print mylink_url
+            print str(traceback.format_exc())
+            for j in range(0,500):
+                try:
+                    print 'sleeping 15 seconds'
+                    time.sleep(15)
+                    print 'done'
+                    page = urllib2.urlopen(mylink_url)
+                    break
+                except:
+                    print mylink_url
+                    print '\n\n\n' + str(j) + '\n\n\n'
+                    print str(traceback.format_exc())
 
-    soup = BeautifulSoup(page)
-    events_table = soup.find_all('div',attrs={'class':'c-compact-river__entry'})
-    d=1
+    if page_found == True:
+        soup = BeautifulSoup(page,'lxml')
+        events_table = soup.find_all('div',attrs={'class':'c-compact-river__entry'})
+        d=1
 
 
-    for myevent_table in events_table:
-        myevent_url = myevent_table.find_all("a")[0].get("href").encode('ascii','ignore')
-        if not pd.isnull(re.match(r'(?i)(.*)(weigh\-in\-results|weigh\-in\-video)(.*|$)',myevent_url)):
-            urls_list.append(myevent_url)
+        for myevent_table in events_table:
+            myevent_url = myevent_table.find_all("a")[0].get("href").encode('ascii','ignore')
+            if not pd.isnull(re.match(r'(?i)(.*)(weigh\-in\-results|weigh\-in\-video)(.*|$)',myevent_url)):
+                urls_list.append(myevent_url)
 
     time.sleep(1)
 
@@ -372,7 +333,6 @@ mma_df['Fighter'] = mma_df['Fighter'].map(lambda x: replace_if_in_dict(x,fighter
 #change column order
 ##mma_df = mma_df[['Organization','Event','Date','Fight Number','Result','Fighter','Opponent','Method','Round','Time','Url']]
 
-mma_df = mma_df.sort_values(['Date'], ascending=[False])
 
 
 
@@ -385,6 +345,30 @@ mma_df = mma_df.sort_values(['Date'], ascending=[False])
 
 
 #todo: fix issue of nan's in fighter name
+
+
+###debug
+##mma_df = pd.read_csv(r'../output data/mma_data_mmafighting_weight.csv',low_memory=False)
+
+
+
+
+#join missing data that we have manually filled in
+mma_missing_df = pd.read_csv(r'../input data/mma_data_mmafighting_weight_missing.csv',low_memory=False)
+
+mma_df = pd.concat([mma_df,mma_missing_df],ignore_index=True)
+
+mma_df = mma_df.sort_values(['Date'], ascending=[False])
+
+
+
+
+#remove duplicate entries
+urls_to_remove_list = [r'https://www.mmafighting.com/2014/3/14/5509874/ufc-171-weigh-in-results-johny-hendricks-misses-weight-on-first',
+                       r'https://www.mmafighting.com/2014/3/14/5510068/ufc-171-weigh-in-results-johny-hendricks-makes-weight-on-second',
+                       r'https://www.mmafighting.com/2010/02/05/ufc-109-weigh-in-video']
+mma_df = mma_df[~(mma_df['Url'].isin(urls_to_remove_list))]
+
 
 
 mma_df.to_csv(r'../output data/mma_data_mmafighting_weight.csv',index=False)

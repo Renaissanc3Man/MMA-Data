@@ -180,3 +180,76 @@ def division_to_weightclass(x):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ##############################################################################
+# Standardize MMA Event Names
+def standardize_event_titles(df, data_source = 'Wikipedia'):
+    event_standardization_df = pd.read_csv(r'../input data/mma_data_event_standardization.csv',low_memory=False)
+
+    event_standardization_df['Date'] = pd.to_datetime(event_standardization_df['Date'])
+    event_standardization_df['Date '+data_source] = pd.to_datetime(event_standardization_df['Date '+data_source])
+
+
+    event_standardization_df = event_standardization_df[['Date','Event','Date '+data_source,'Event '+data_source]]
+    event_standardization_df = event_standardization_df.dropna(subset=['Date '+data_source,'Event '+data_source])
+
+    #change names, join, then fillna from other col
+    event_standardization_df = event_standardization_df.rename(columns={'Date':'Date_standardized',
+                                                                        'Event':'Event_standardized',
+                                                                        'Date '+data_source:'Date_temp2',
+                                                                        'Event '+data_source: 'Event_temp2'})
+
+    df = df.rename(columns={'Date':'Date_temp1','Event':'Event_temp1'})
+
+    df = df.merge(event_standardization_df, left_on = ['Date_temp1','Event_temp1'], right_on = ['Date_temp2','Event_temp2'],how='left')
+
+##    #debug
+##    df['d1'] = df['Date_temp1'].shift(-1) == df['Date_temp1']
+##    df['d2'] = df['Date_temp1'].shift(1) == df['Date_temp1']
+##    to_newexcel(df)
+
+    df = fillna_from_other_col(df,'Date_temp1','Date_standardized')
+    df = fillna_from_other_col(df,'Event_temp1','Event_standardized')
+
+
+
+    df = df.rename(columns={'Date_standardized':'Date' , 'Event_standardized':'Event'})
+
+    del df['Date_temp1']
+    del df['Event_temp1']
+    del df['Date_temp2']
+    del df['Event_temp2']
+
+    return df
+
+
+
+
+
+
+
+
+
+#get rid of events that are non-ufc
+def filter_non_ufc_event(df):
+    df = df[~(df['Event'].fillna('nan').str.contains(r'Bellator|WSOF|Strikeforce|Mayweather|Invicta|PFL|Professional Fighters League|WEC|Pacquiao|World Series of Fighting|Moosin|Canelo|GGG|Tuesday'))]
+    return df
+
+
+
+
+
+
+

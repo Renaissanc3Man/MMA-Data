@@ -3,20 +3,6 @@ sys.path.append(os.path.dirname(__file__))
 from mma_data_library import *
 
 
-##import numpy as np
-##import pandas as pd
-##import re
-##import datetime
-##import traceback
-##
-##import urllib2
-##from bs4 import BeautifulSoup
-##
-###for later use in replacing misspelled names
-##def replace_if_in_dict(parm,mydict):
-##    if not pd.isnull(parm) and parm in list(mydict.keys()):
-##        parm = mydict[parm]
-##    return parm
 
 
 
@@ -24,21 +10,31 @@ from mma_data_library import *
 
 
 #todo: figure out why http://www.sherdog.com/events/UFC-Fight-Night-121-Werdum-vs-Tybura-61985 data is missing
+#                     http://www.sherdog.com/events/UFC-82-Pride-of-a-Champion-6039
 
 
 
 
-link_urls_list = [r'http://www.sherdog.com/organizations/Pride-Fighting-Championships-3/recent-events/1',
-                  r'http://www.sherdog.com/organizations/World-Extreme-Cagefighting-48/recent-events/1',
-                  r'http://www.sherdog.com/organizations/World-Series-of-Fighting-5449/recent-events/1',
-                  r'http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2/recent-events/1',
+##link_urls_list = [r'http://www.sherdog.com/organizations/Pride-Fighting-Championships-3/recent-events/1',
+##                  r'http://www.sherdog.com/organizations/World-Extreme-Cagefighting-48/recent-events/1',
+##                  r'http://www.sherdog.com/organizations/World-Series-of-Fighting-5449/recent-events/1',
+##                  r'http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2/recent-events/1',
+##                  r'http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2/recent-events/2',
+##                  r'http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2/recent-events/3',
+##                  r'http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2/recent-events/4',
+##                  r'http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2/recent-events/5',
+##                  r'http://www.sherdog.com/organizations/Bellator-MMA-1960/recent-events/1',
+##                  r'http://www.sherdog.com/organizations/Bellator-MMA-1960/recent-events/2',
+##                  r'http://www.sherdog.com/organizations/Strikeforce-716/recent-events/1']
+
+
+link_urls_list = [r'http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2/recent-events/1',
                   r'http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2/recent-events/2',
                   r'http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2/recent-events/3',
                   r'http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2/recent-events/4',
-                  r'http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2/recent-events/5',
-                  r'http://www.sherdog.com/organizations/Bellator-MMA-1960/recent-events/1',
-                  r'http://www.sherdog.com/organizations/Bellator-MMA-1960/recent-events/2',
-                  r'http://www.sherdog.com/organizations/Strikeforce-716/recent-events/1']
+                  r'http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2/recent-events/5']
+
+
 
 
 
@@ -46,20 +42,23 @@ link_urls_list = [r'http://www.sherdog.com/organizations/Pride-Fighting-Champion
 urls_list = []
 for mylink_url in link_urls_list:
     page = urllib2.urlopen(mylink_url)
-    soup = BeautifulSoup(page)
-    events_table = soup.find_all('tr',attrs={'class':'even','class':'odd'})
+    soup = BeautifulSoup(page, 'lxml')
+    events_table1 = soup.find_all('tr',attrs={'class':'even'})
+    events_table2 = soup.find_all('tr',attrs={'class':'odd'})
 
+    events_table = events_table1 + events_table2
 
     for myevent_table in events_table:
         urls_list.append(myevent_table.find_all("a")[0].get("href").encode('ascii','ignore'))
 
-print urls_list
+##print urls_list
 
 
 
 
 
-
+###debug
+##urls_list = [r'/events/UFC-82-Pride-of-a-Champion-6039']
 
 
 
@@ -68,13 +67,16 @@ print urls_list
 event_dfs_list = []
 for myurl in urls_list:
 
+    if myurl == r'/events/UFC-Fight-Night-123-Swanson-vs-Ortega-62623':
+        d=1
+
     try:
         #first open non-printer friendly version of event because it contains the full date
         myurl = r'http://www.sherdog.com' + myurl
         #df = pd.read_html(myurl)
 
         page = urllib2.urlopen(myurl)
-        soup = BeautifulSoup(page)
+        soup = BeautifulSoup(page, 'lxml')
 
 
         event_date = pd.to_datetime(soup.find_all('span',attrs={'class':'date'})[1].get_text())

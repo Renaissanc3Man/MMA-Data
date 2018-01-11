@@ -41,7 +41,7 @@ __Data Joining Scripts:__
 	* _Output:_ mma_data_weight_cutting_joined.csv
 
 * __mma_data_validation.py__ - playground for cross checking data
-	* _Input:_ all files
+	* _Input:_ mma_data_event_standardization.csv, mma_data_fighter_name_standardization.csv, all output files
 	* _Output:_ temp dataframes to clipboard
 
 

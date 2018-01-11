@@ -1,0 +1,107 @@
+Traceback (most recent call last):
+  File "C:\__YOUTUBE__\__MMA__\MMA Data\Scripts\mma_data_mmafighting_weight.py", line 74, in <module>
+    page = urllib2.urlopen(mylink_url)
+  File "C:\ProgramData\Anaconda2\lib\urllib2.py", line 154, in urlopen
+    return opener.open(url, data, timeout)
+  File "C:\ProgramData\Anaconda2\lib\urllib2.py", line 435, in open
+    response = meth(req, response)
+  File "C:\ProgramData\Anaconda2\lib\urllib2.py", line 548, in http_response
+    'http', request, response, code, msg, hdrs)
+  File "C:\ProgramData\Anaconda2\lib\urllib2.py", line 473, in error
+    return self._call_chain(*args)
+  File "C:\ProgramData\Anaconda2\lib\urllib2.py", line 407, in _call_chain
+    result = func(*args)
+  File "C:\ProgramData\Anaconda2\lib\urllib2.py", line 556, in http_error_default
+    raise HTTPError(req.get_full_url(), code, msg, hdrs, fp)
+HTTPError: HTTP Error 429: Too Many Requests
+
+sleeping 15 seconds
+done
+https://www.mmafighting.com/2010/04/09/ufc-112-weigh-in-results
+['The full weigh-in results are below.Pay-Per-View Card\nUFC Middleweight Championship -- Demian Maia 184 VS Anderson Silva 185']
+Traceback (most recent call last):
+  File "C:\__YOUTUBE__\__MMA__\MMA Data\Scripts\mma_data_mmafighting_weight.py", line 225, in <module>
+    fighter1 = myfight[-2] #less errors by taking end of list
+IndexError: list index out of range
+
+https://www.mmafighting.com/2010/04/09/ufc-112-weigh-in-results
+['-- Frank Edgar 154 VS BJ Penn 155']
+Traceback (most recent call last):
+  File "C:\__YOUTUBE__\__MMA__\MMA Data\Scripts\mma_data_mmafighting_weight.py", line 225, in <module>
+    fighter1 = myfight[-2] #less errors by taking end of list
+IndexError: list index out of range
+
+https://www.mmafighting.com/2010/04/09/ufc-112-weigh-in-results
+['Renzo Gracie 171 VS Matt Hughes 170']
+Traceback (most recent call last):
+  File "C:\__YOUTUBE__\__MMA__\MMA Data\Scripts\mma_data_mmafighting_weight.py", line 225, in <module>
+    fighter1 = myfight[-2] #less errors by taking end of list
+IndexError: list index out of range
+
+https://www.mmafighting.com/2010/04/09/ufc-112-weigh-in-results
+['Rafael Dos Anjos 156 VS Terry Etim 154']
+Traceback (most recent call last):
+  File "C:\__YOUTUBE__\__MMA__\MMA Data\Scripts\mma_data_mmafighting_weight.py", line 225, in <module>
+    fighter1 = myfight[-2] #less errors by taking end of list
+IndexError: list index out of range
+
+https://www.mmafighting.com/2010/04/09/ufc-112-weigh-in-results
+['Mark Munoz 185 VS Kendall Grove 185']
+Traceback (most recent call last):
+  File "C:\__YOUTUBE__\__MMA__\MMA Data\Scripts\mma_data_mmafighting_weight.py", line 225, in <module>
+    fighter1 = myfight[-2] #less errors by taking end of list
+IndexError: list index out of range
+
+https://www.mmafighting.com/2010/04/09/ufc-112-weigh-in-results
+['Preliminary Card\nPhil Davis 204 VS Alexander Gustafsson 205']
+Traceback (most recent call last):
+  File "C:\__YOUTUBE__\__MMA__\MMA Data\Scripts\mma_data_mmafighting_weight.py", line 225, in <module>
+    fighter1 = myfight[-2] #less errors by taking end of list
+IndexError: list index out of range
+
+https://www.mmafighting.com/2010/04/09/ufc-112-weigh-in-results
+['John Gunderson 154 VS Paul Taylor 155']
+Traceback (most recent call last):
+  File "C:\__YOUTUBE__\__MMA__\MMA Data\Scripts\mma_data_mmafighting_weight.py", line 225, in <module>
+    fighter1 = myfight[-2] #less errors by taking end of list
+IndexError: list index out of range
+
+https://www.mmafighting.com/2010/04/09/ufc-112-weigh-in-results
+['Rick Story 169 VS Nick Osipczak 170']
+Traceback (most recent call last):
+  File "C:\__YOUTUBE__\__MMA__\MMA Data\Scripts\mma_data_mmafighting_weight.py", line 225, in <module>
+    fighter1 = myfight[-2] #less errors by taking end of list
+IndexError: list index out of range
+
+https://www.mmafighting.com/2010/04/09/ufc-112-weigh-in-results
+['Brad Blackburn 170 VS DaMarques Johnson 170']
+Traceback (most recent call last):
+  File "C:\__YOUTUBE__\__MMA__\MMA Data\Scripts\mma_data_mmafighting_weight.py", line 225, in <module>
+    fighter1 = myfight[-2] #less errors by taking end of list
+IndexError: list index out of range
+
+https://www.mmafighting.com/2010/04/09/ufc-112-weigh-in-results
+['Matt Veach 155 VS Paul Kelly 156']
+Traceback (most recent call last):
+  File "C:\__YOUTUBE__\__MMA__\MMA Data\Scripts\mma_data_mmafighting_weight.py", line 225, in <module>
+    fighter1 = myfight[-2] #less errors by taking end of list
+IndexError: list index out of range
+
+https://www.mmafighting.com/2010/04/09/ufc-112-weigh-in-results
+['Mostapha Al Turk 235 VS Jon Madsen 252']
+Traceback (most recent call last):
+  File "C:\__YOUTUBE__\__MMA__\MMA Data\Scripts\mma_data_mmafighting_weight.py", line 225, in <module>
+    fighter1 = myfight[-2] #less errors by taking end of list
+IndexError: list index out of range
+
+
+
+error for: https://www.mmafighting.com/2010/04/09/ufc-112-weigh-in-results
+Traceback (most recent call last):
+  File "C:\__YOUTUBE__\__MMA__\MMA Data\Scripts\mma_data_mmafighting_weight.py", line 274, in <module>
+    event_df = pd.concat(fighter_dfs_list,ignore_index=True)
+  File "C:\ProgramData\Anaconda2\lib\site-packages\pandas\core\reshape\concat.py", line 206, in concat
+    copy=copy)
+  File "C:\ProgramData\Anaconda2\lib\site-packages\pandas\core\reshape\concat.py", line 239, in __init__
+    raise ValueError('No objects to concatenate')
+ValueError: No objects to concatenate
